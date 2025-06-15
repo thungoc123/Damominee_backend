@@ -7,8 +7,13 @@ app.use(cors({
 }));
 app.use(express.json()); 
 const authRoutes = require('./routes/authRoutes');
-
+const postRoutes = require('./routes/postRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const seriesRoutes = require('./routes/seriesRoutes');
 app.use('/api/auth', authRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/series', seriesRoutes);
 // app.use('/api/posts', postRoutes);
 
 module.exports = app;

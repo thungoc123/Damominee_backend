@@ -7,7 +7,16 @@ const userSchema = new mongoose.Schema({
   bio: String,
   isAdmin: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
-  bookmarkedPostIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
+
+  // Bookmark các post
+  bookmarkedPostIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+  // Danh sách các bài đã đọc trong từng series
+  
+  readProgress: [{
+    seriesId: { type: mongoose.Schema.Types.ObjectId, ref: 'Series' },
+    readPostIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+    updatedAt: { type: Date, default: Date.now }
+  }]
 });
 
 
@@ -24,4 +33,4 @@ userSchema.methods.comparePassword = async function (password) {
 };
 
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.models.User || mongoose.model('User', userSchema);

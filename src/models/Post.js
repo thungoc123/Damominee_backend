@@ -11,5 +11,7 @@ const postSchema = new mongoose.Schema({
   likeCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });
+// posts có thể thuộc Series 
+// Có LikeCount để hiển thị số người thích
 
 module.exports = mongoose.model('Post', postSchema);

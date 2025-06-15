@@ -6,4 +6,6 @@ const likeSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Người dùng like hoặc bookmark bài 
+// Cách này giúp tracking chính xác 
 module.exports = mongoose.model('Like', likeSchema);
