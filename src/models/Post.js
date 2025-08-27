@@ -9,6 +9,7 @@ const postSchema = new mongoose.Schema({
   categoryIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
   seriesId: { type: mongoose.Schema.Types.ObjectId, ref: 'Series' },
   likeCount: { type: Number, default: 0 },
+  isPublish: { type: Boolean, default: false }, // ✅ thêm dòng này
   createdAt: { type: Date, default: Date.now }
 });
 // posts có thể thuộc Series 

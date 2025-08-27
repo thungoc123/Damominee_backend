@@ -15,6 +15,7 @@ exports.createPost = async (req, res) => {
           });
           await post.save();
           res.status(201).json({
+               status: 'success',
                message: 'Post created successfully',
                post
           });
@@ -88,6 +89,7 @@ exports.updatePost = async (req, res) => {
           }
 
           res.status(200).json({
+               status: 'success',
                message: 'Post updated successfully',
                post
           });
@@ -111,11 +113,11 @@ exports.deletePost = async (req, res) => {
           }
 
           res.status(200).json({
-          message: 'Post deleted successfully',
-          post
-     });
-}
-     catch (error) {
+               status: 'success',
+               message: 'Post deleted successfully',
+               post
+          });
+     } catch (error) {
      console.error('Error deleting post:', error);
      res.status(500).json({
           message: 'Internal server error',
@@ -123,3 +125,34 @@ exports.deletePost = async (req, res) => {
      });
 }
 }
+
+
+exports.updatePostStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isPublish } = req.body;
+
+    if (typeof isPublish !== 'boolean') {
+      return res.status(400).json({ message: '`isPublish` must be true or false' });
+    }
+
+    const post = await Post.findByIdAndUpdate(
+      id,
+      { isPublish },
+      { new: true }
+    );
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    res.json({
+      status: 'success',
+      message: `Post has been ${isPublish ? 'published' : 'unpublished'} successfully`,
+      post
+    });
+  } catch (error) {
+    console.error('Error updating post status:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
