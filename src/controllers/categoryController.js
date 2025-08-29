@@ -1,4 +1,5 @@
 const Category = require('../models/category');
+const Post = require('../models/Post');
 
 exports.createCategory = async (req, res) => {
      try {
@@ -93,3 +94,48 @@ exports.deleteCategory = async (req, res) => {
           });
      }
 }
+
+exports.getPostsByCategorySlug = async (req, res) => {
+     try {
+          const { slug } = req.params;
+          console.log('Searching for category with slug:', slug);
+          
+          const category = await Category.findOne({ slug });
+          if (!category) {
+               return res.status(404).json({
+                    message: 'Category not found'
+               });
+          }
+          
+          console.log('Found category:', category);
+          console.log('Category ID:', category._id);
+          
+          // Lấy các bài viết đã publish theo category
+          // Nếu Post có trường categoryIds là mảng các ObjectId tham chiếu Category
+          // Lấy các bài viết đã publish mà categoryIds chứa category._id
+          const posts = await Post.find({ 
+               categoryIds: { $in: [category._id] }, 
+               isPublish: true 
+          }).populate('authorId', 'name email')
+            .populate('categoryIds', 'name')
+            .populate('seriesId', 'title');
+          
+          console.log('Found posts:', posts);
+          console.log('Number of posts found:', posts.length);
+          
+          res.status(200).json({
+               message: 'Posts retrieved successfully',
+               posts,
+               category: {
+                    name: category.name,
+                    slug: category.slug
+               }
+          });
+     } catch (error) {
+          console.error('Error retrieving posts by category:', error);
+          res.status(500).json({
+               message: 'Internal server error',
+               error: error.message
+          });
+     }
+};

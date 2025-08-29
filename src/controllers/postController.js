@@ -1,4 +1,5 @@
 const Post = require('../models/Post');
+const Series = require('../models/Series');
 const mongoose = require('mongoose');
 
 // Create a new post
@@ -15,6 +16,16 @@ exports.createPost = async (req, res) => {
                authorId: req.user._id
           });
           await post.save();
+          
+          // Nếu có seriesId, thêm post vào series
+          if (seriesId) {
+               const series = await Series.findById(seriesId);
+               if (series && !series.postIds.includes(post._id)) {
+                    series.postIds.push(post._id);
+                    await series.save();
+               }
+          }
+          
           res.status(201).json({
                status: 'success',
                message: 'Post created successfully',
@@ -132,16 +143,39 @@ exports.updatePost = async (req, res) => {
           const { slug } = req.params;
           const { title, content, coverImage, categoryIds, seriesId } = req.body;
 
+          // Lấy post hiện tại để so sánh seriesId
+          const currentPost = await Post.findOne({ slug });
+          if (!currentPost) {
+               return res.status(404).json({
+                    message: 'Post not found'
+               });
+          }
+
+          const oldSeriesId = currentPost.seriesId;
+
           const post = await Post.findOneAndUpdate(
                { slug },
                { title, content, coverImage, categoryIds, seriesId },
                { new: true }
           );
 
-          if (!post) {
-               return res.status(404).json({
-                    message: 'Post not found'
-               });
+          // Xử lý thay đổi seriesId
+          if (oldSeriesId && oldSeriesId.toString() !== seriesId) {
+               // Xóa post khỏi series cũ
+               const oldSeries = await Series.findById(oldSeriesId);
+               if (oldSeries) {
+                    oldSeries.postIds = oldSeries.postIds.filter(id => id.toString() !== post._id.toString());
+                    await oldSeries.save();
+               }
+          }
+
+          if (seriesId && seriesId !== oldSeriesId?.toString()) {
+               // Thêm post vào series mới
+               const newSeries = await Series.findById(seriesId);
+               if (newSeries && !newSeries.postIds.includes(post._id)) {
+                    newSeries.postIds.push(post._id);
+                    await newSeries.save();
+               }
           }
 
           res.status(200).json({
