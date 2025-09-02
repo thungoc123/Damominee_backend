@@ -102,10 +102,10 @@ exports.reorderPostsInSeries = async (req, res) => {
           }
           series.postIds = postIds;
           await series.save();
-          res.status(200).json({ message: 'Posts reordered successfully', series });
+          res.status(200).json({ status: 'success', message: 'Posts reordered successfully', series });
      } catch (error) {
           console.error('Error reordering posts in series:', error);
-          res.status(500).json({ message: 'Internal server error' });
+          res.status(500).json({ status: 'error', message: 'Internal server error' });
      }
 }
 
@@ -129,10 +129,15 @@ exports.addPostToSeries = async (req, res) => {
 
           series.postIds.push(postId);
           await series.save();
-          res.status(200).json({ message: 'Post added to series successfully', series });
+
+          // Đồng bộ: cập nhật seriesId của post về id của series
+          const Post = require('../models/Post');
+          await Post.findByIdAndUpdate(postId, { seriesId: id });
+
+          res.status(200).json({status: 'success', message: 'Post added to series successfully', series });
      } catch (error) {
           console.error('Error adding post to series:', error);
-          res.status(500).json({ message: 'Internal server error' });
+          res.status(500).json({ status: 'error', message: 'Internal server error' });
      }
 }
 exports.removePostFromSeries = async (req, res) => {
@@ -153,12 +158,18 @@ exports.removePostFromSeries = async (req, res) => {
                return res.status(400).json({ message: 'Post does not exist in the series' });
           }
 
+          // Xóa post khỏi series
           series.postIds = series.postIds.filter(post => post.toString() !== postId);
           await series.save();
-          res.status(200).json({ message: 'Post removed from series successfully', series });
+
+          // Đồng bộ: cập nhật seriesId của post về null
+          const Post = require('../models/Post');
+          await Post.findByIdAndUpdate(postId, { seriesId: null });
+
+          res.status(200).json({ success: 'success', message: 'Post removed from series successfully', series });
      } catch (error) {
           console.error('Error removing post from series:', error);
-          res.status(500).json({ message: 'Internal server error' });
+          res.status(500).json({ success: 'error', message: 'Internal server error' });
      }
 }
 

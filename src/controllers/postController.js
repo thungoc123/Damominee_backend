@@ -43,10 +43,13 @@ exports.createPost = async (req, res) => {
 
 exports.getPublishedPosts = async (req, res) => {
      try {
+          const sort = { createdAt: -1 };
           const posts = await Post.find({ isPublish: true })
+               .sort(sort)
                .populate('authorId', 'name email')
                .populate('categoryIds', 'name')
                .populate('seriesId', 'title');
+          
           res.status(200).json({
                message: 'Published posts retrieved successfully',
                posts
@@ -61,11 +64,20 @@ exports.getPublishedPosts = async (req, res) => {
 };
 exports.getAllPosts = async (req, res) => {
      try {
-          const posts = await Post.find().populate('authorId', 'name email').populate('categoryIds', 'name').populate('seriesId', 'title');
-          res.status(200).json({
+          const sort = { createdAt: -1 };
+          const posts = await Post.find().sort(sort)
+               .populate('authorId', 'name email')
+               .populate('categoryIds', 'name')
+               .populate('seriesId', 'title');
+          return res.status(200).json({
                message: 'Posts retrieved successfully',
                posts
           });
+          // const posts = await Post.find().populate('authorId', 'name email').populate('categoryIds', 'name').populate('seriesId', 'title');
+          // res.status(200).json({
+          //      message: 'Posts retrieved successfully',
+          //      posts
+          // });
      } catch (error) {
           console.error('Error retrieving posts:', error);
           res.status(500).json({

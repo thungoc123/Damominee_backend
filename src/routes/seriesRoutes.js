@@ -11,8 +11,8 @@ router.get('/:id', seriesController.getSeriesById);
 router.put('/:id', auth, seriesController.updateSeries);
 router.delete('/:id', auth, seriesController.deleteSeries);
 router.put('/:id/reorder-posts', auth, seriesController.reorderPostsInSeries);
-router.post('/:id/add-post', auth, seriesController.addPostToSeries);
-router.delete('/:id/remove-post/:postId', auth, seriesController.removePostFromSeries);
+router.put('/:id/add-post', auth, seriesController.addPostToSeries);
+router.put('/:id/remove-post/:postId', auth, seriesController.removePostFromSeries);
 router.post('/:id/sync-posts', auth, seriesController.syncSeriesPosts);
 router.post('/sync-all', auth, seriesController.syncAllSeriesPosts);
 
