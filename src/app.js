@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 app.use(cors({
-  origin: 'http://localhost:3000', // hoặc true để cho tất cả origin
+  origin: 'https://damominee-pi.vercel.app/', // hoặc true để cho tất cả origin
   credentials: true, // nếu frontend gửi cookie
 }));
 app.use(express.json()); 
